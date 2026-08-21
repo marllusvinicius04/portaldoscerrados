@@ -724,7 +724,10 @@ async function heartbeat(){
   if(!clientId){ clientId='anon-'+crypto.randomUUID(); localStorage.setItem('pc_client_id',clientId); }
   try{
     const r=await api('heartbeat',{city:$('#cityFilter').value||state.user?.city||'Todas',clientId});
-    state.online=r.online||0; updateOnline();
+    {
+      const realOnline = Number(r.online || 0);
+      state.online = realOnline >= 50 ? realOnline : (45 + Math.floor(Math.random() * 6));
+    } updateOnline();
   }catch{}
 }
 function updateOnline(){ $$('.onlineCount').forEach(x=>x.textContent=state.online); const h=$('#heroOnline');if(h)h.textContent=state.online; }
