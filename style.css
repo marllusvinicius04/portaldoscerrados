@@ -202,3 +202,26 @@ img,video,iframe{max-width:100%}
 .menuLogo{width:min(220px,70%);height:auto;display:block;margin:4px 0 18px}
 .heroBrandLogo{width:min(260px,62vw);height:auto;display:block;margin:0 0 18px;filter:drop-shadow(0 8px 20px rgba(0,0,0,.28))}
 @media(max-width:520px){.brandLogo{height:30px;max-width:160px}.previewLogo{width:min(280px,72vw)}.heroBrandLogo{width:min(220px,58vw)}}
+
+/* ===== V10: feed seguro + ações compactas + modo leitura ===== */
+#page-feed{position:relative;background:#000}
+#page-feed.active{margin-top:-66px;padding-top:0}
+#page-feed .feedWrap{height:calc(100dvh - 76px);padding-top:66px;scroll-padding-top:66px}
+#page-feed .feedItem{height:calc(100dvh - 76px);min-height:calc(100dvh - 76px)}
+#page-feed .feedMeta{bottom:104px;right:82px;max-height:46%;overflow:visible}
+#page-feed .feedMeta h2{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+#page-feed .feedMeta p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin-bottom:10px}
+#page-feed .feedActions{bottom:106px;gap:10px}
+.feedActions button{width:48px;height:48px;min-height:48px;border-radius:50%;display:grid;place-items:center;padding:0;font-size:20px}
+.feedActions button i{margin:0}
+.feedActions .onlineAction{height:auto;min-height:52px;border-radius:18px;font-size:10px;line-height:1.1;gap:3px;padding:6px 2px}
+.feedActions .onlineAction .onlineCount{font-size:10px;font-weight:800}
+.feedActions small{display:none!important}
+.sheet{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.articleToolbar{position:sticky;top:0;z-index:12;display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:8px 0 12px;background:linear-gradient(#f7f5ef 72%,rgba(247,245,239,0))}
+.articleToolBtn,.articleCloseBtn{border:1px solid #d8d6cf;background:#fff;color:#172226;border-radius:999px;min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 13px;font-weight:800}
+.articleCloseBtn{width:42px;padding:0;font-size:18px}
+.sheet.readingMode .articleMedia{display:none!important}
+.sheet.readingMode .article .body{font-size:20px;line-height:1.95;max-width:700px;margin-inline:auto}
+.sheet.readingMode .articleFooterActions{margin-top:32px}
+@media(max-width:520px){#page-feed .feedMeta{left:14px;right:72px;bottom:100px;max-height:48%}#page-feed .feedActions{right:8px;bottom:102px}.feedActions button{width:44px;height:44px;min-height:44px}.articleToolbar{padding-top:4px}.articleToolBtn span{font-size:12px}}
