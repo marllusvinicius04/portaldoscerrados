@@ -1,0 +1,33 @@
+:root{
+  --bg:#001A21;
+  --card:#06272d;
+  --card2:#0A3036;
+  --text:#FAFAF7;
+  --muted:#9fb4b7;
+  --accent:#1DD96C;
+  --accent-dark:#218152;
+  --danger:#ff6068;
+  --line:rgba(250,250,247,.10);
+  --shadow:0 18px 60px rgba(0,0,0,.28)
+}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,rgba(29,217,108,.08),transparent 30%),var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Arial}.hide{display:none!important}
+button,input,select,textarea{font:inherit}.btn{border:1px solid var(--line);border-radius:13px;padding:11px 14px;background:var(--card2);color:#fff;cursor:pointer;transition:.18s}.btn:hover{transform:translateY(-1px);border-color:rgba(29,217,108,.35)}.btn i{width:18px;text-align:center;margin-right:7px}.primary{background:var(--accent);color:#001A21;font-weight:900;border-color:transparent}.danger{background:var(--danger);color:#fff;border-color:transparent}.ghost{border:1px solid var(--line);background:transparent}
+.shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}.side{padding:18px;border-right:1px solid var(--line);background:linear-gradient(180deg,#001A21,#05272d);position:sticky;top:0;height:100vh;box-shadow:12px 0 40px rgba(0,0,0,.16)}.brand{font-weight:900;font-size:20px;margin-bottom:20px}.brand b{color:var(--accent)}
+.side button{width:100%;text-align:left;margin:5px 0;display:flex;align-items:center;gap:4px}.side button.primary{box-shadow:0 8px 24px rgba(29,217,108,.15)}.main{padding:24px}.top{display:flex;align-items:center;gap:10px;margin-bottom:20px}.grow{flex:1}.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{background:linear-gradient(180deg,rgba(10,48,54,.92),rgba(6,39,45,.96));border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}.span4{grid-column:span 4}.span6{grid-column:span 6}.span12{grid-column:span 12}
+.field{display:grid;gap:6px;margin:10px 0}.field input,.field select,.field textarea{width:100%;background:#001A21;border:1px solid var(--line);color:#fff;border-radius:12px;padding:12px;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(29,217,108,.09)}.field textarea{min-height:120px}
+.editor{min-height:280px;background:#fff;color:#111;border-radius:12px;padding:16px;overflow:auto}.toolbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.toolbar button{padding:7px 10px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}.muted{color:var(--muted)}.pill{display:inline-block;padding:5px 8px;border-radius:999px;background:rgba(29,217,108,.12);color:#baffd4;border:1px solid rgba(29,217,108,.20);font-size:11px}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 70% 20%,rgba(29,217,108,.12),transparent 32%),#001A21}.loginCard{width:min(440px,100%);background:linear-gradient(180deg,#0A3036,#06272d);border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 30px 90px rgba(0,0,0,.35)}.loading{position:fixed;inset:0;z-index:100;background:rgba(0,26,33,.94);display:grid;place-items:center}.spinner{width:42px;height:42px;border:4px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#fff;color:#111;padding:10px 14px;border-radius:12px;z-index:110}
+.preview{width:100%;max-height:180px;object-fit:cover;border-radius:12px;background:#000}
+@media(max-width:850px){.shell{grid-template-columns:1fr}.side{height:auto;position:relative;display:flex;overflow:auto;gap:6px}.side .brand{min-width:210px}.side button{width:auto;white-space:nowrap}.span4,.span6{grid-column:span 12}.main{padding:14px}}
+
+.adminLogo{display:block;width:min(220px,78%);height:auto;object-fit:contain;margin:0 0 24px}
+.loginLogo{display:block;width:min(280px,82%);height:auto;margin:0 auto 24px;filter:drop-shadow(0 12px 28px rgba(0,0,0,.28))}
+.topBrand{display:flex;align-items:center;gap:10px}
+.topBrand img{height:34px;width:auto;max-width:190px;object-fit:contain}
+.sideSep{height:1px;background:var(--line);margin:12px 0}
+.sectionIcon{color:var(--accent);margin-right:8px}
+@media(max-width:850px){
+  .adminLogo{width:150px;min-width:150px;margin:0 10px 0 0}
+}
