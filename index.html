@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Portal dos Cerrados | Notícias dos Cerrados, Piauí, Maranhão e Região</title>
+<meta name="description" content="Portal dos Cerrados: notícias dos Cerrados, Piauí, Maranhão e região. Política, agronegócio, educação, cultura, esportes, negócios, entretenimento e acontecimentos regionais em tempo real.">
+<meta name="keywords" content="Portal dos Cerrados, notícias dos Cerrados, notícias Piauí, notícias Maranhão, notícias regionais, agronegócio, agro, política, educação, cultura, esporte, negócios, entretenimento, Uruçuí, Baixa Grande do Ribeiro, Ribeiro Gonçalves, Benedito Leite, sul do Piauí, sul do Maranhão">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="googlebot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="author" content="Portal dos Cerrados">
+<meta name="application-name" content="Portal dos Cerrados">
+<meta name="theme-color" content="#001A21">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Portal dos Cerrados">
+<meta property="og:title" content="Portal dos Cerrados | Notícias dos Cerrados e Região">
+<meta property="og:description" content="Notícias, política, agro, educação, cultura, esportes, negócios e acontecimentos dos Cerrados, Piauí, Maranhão e região.">
+<meta property="og:image" content="https://i.ibb.co/qYjK5r1G/Chat-GPT-Image-21-de-ago-de-2026-19-07-46-removebg-preview-1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Portal dos Cerrados | Notícias dos Cerrados e Região">
+<meta name="twitter:description" content="Informação regional dos Cerrados: política, agro, educação, cultura, esporte, negócios e muito mais.">
+<meta name="twitter:image" content="https://i.ibb.co/qYjK5r1G/Chat-GPT-Image-21-de-ago-de-2026-19-07-46-removebg-preview-1.png">
+<link rel="icon" href="https://i.ibb.co/qYjK5r1G/Chat-GPT-Image-21-de-ago-de-2026-19-07-46-removebg-preview-1.png">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"NewsMediaOrganization",
+  "name":"Portal dos Cerrados",
+  "description":"Portal de notícias dos Cerrados, com cobertura regional de política, agronegócio, educação, cultura, esportes, negócios e entretenimento.",
+  "logo":{"@type":"ImageObject","url":"https://i.ibb.co/qYjK5r1G/Chat-GPT-Image-21-de-ago-de-2026-19-07-46-removebg-preview-1.png"},
+  "areaServed":[
+    {"@type":"AdministrativeArea","name":"Cerrados"},
+    {"@type":"State","name":"Piauí"},
+    {"@type":"State","name":"Maranhão"}
+  ]
+}
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="seo-content" aria-label="Sobre o Portal dos Cerrados">
+  <h1>Portal dos Cerrados — Notícias dos Cerrados, Piauí, Maranhão e Região</h1>
+  <p>Portal regional de notícias com cobertura de política, agronegócio, educação, cultura, esportes, negócios, entretenimento e acontecimentos das cidades dos Cerrados.</p>
+</div>
+<div id="loading" class="loading hide"><div class="loaderBox"><div class="spinner"></div><p id="loadingText">Carregando...</p></div></div>
+<div id="toast" class="toast"></div>
+
+<section id="preview" class="preview hide">
+  <div class="previewVisual">
+    <div class="previewText">
+      <div class="eyebrow">PORTAL DOS CERRADOS</div>
+      <h1>Uruçuí e região em uma nova experiência.</h1>
+      <p>Política, educação, cultura, agro, esporte e as pautas que movimentam os Cerrados.</p>
+    </div>
+  </div>
+  <div class="previewActions">
+    <div class="previewBox">
+      <h2>Entre gratuitamente</h2>
+      <p class="muted">Crie sua conta para personalizar sua cidade e seus canais favoritos.</p>
+      <button class="btn primary" style="width:100%;margin:8px 0" onclick="openAuth('signup')">Criar conta grátis</button>
+      <button class="btn ghost" style="width:100%" onclick="openAuth('login')">Já tenho conta</button>
+    </div>
+  </div>
+</section>
+
+<div id="app" class="app">
+  <header class="topbar">
+    <div class="brand"><img class="brandLogo" src="https://i.ibb.co/qYjK5r1G/Chat-GPT-Image-21-de-ago-de-2026-19-07-46-removebg-preview-1.png" alt="Portal dos Cerrados"></div>
+    <div class="grow"></div>
+    <select id="cityFilter" class="citySelect"></select>
+    <button class="iconbtn" onclick="openMenu()"><i class="fa-solid fa-bars"></i></button>
+  </header>
+
+  <main>
+    <section id="page-home" class="page active">
+      <div id="hero" class="hero"></div>
+      <div class="container">
+        <section class="section"><div class="sectionTitle"><h2>Em destaque</h2></div><div id="highlights" class="scroller"></div></section>
+        <section class="section"><div class="sectionTitle"><h2>Você mais gostou</h2><span class="muted">baseado nos canais que segue</span></div><div id="likedForYou" class="scroller"></div></section>
+        <section class="section"><div class="sectionTitle"><h2>Canais</h2></div><div id="channels" class="scroller"></div></section>
+        <section class="section"><div class="sectionTitle"><h2>Últimas pautas</h2></div><div id="latest" class="scroller"></div></section>
+      </div>
+    </section>
+
+    <section id="page-feed" class="page"><div id="feed" class="feedWrap"></div></section>
+
+    <section id="page-channels" class="page">
+      <div class="container section"><div class="sectionTitle"><h2>Canais</h2></div><div id="channelsGrid" class="scroller" style="grid-auto-columns:minmax(230px,32%)"></div></div>
+    </section>
+
+    <section id="page-search" class="page">
+      <div class="container section">
+        <div class="searchBox"><input id="searchInput" placeholder="Buscar pauta, cidade ou canal..."><button class="btn primary" onclick="doSearch()">Buscar</button></div>
+        <div id="searchResults" class="section"></div>
+      </div>
+    </section>
+
+    <section id="page-advertise" class="page">
+      <div class="container section">
+        <div class="card" style="padding:28px;min-height:auto">
+          <span class="eyebrow">ANUNCIE NO PORTAL</span>
+          <h1>Fale com quem vive a região.</h1>
+          <p class="muted">Divulgue sua empresa no feed e nos espaços comerciais do Portal dos Cerrados.</p>
+          <a class="btn primary" style="display:inline-block;text-decoration:none" target="_blank" rel="noopener noreferrer" href="https://wa.me/5589994372011?text=Ol%C3%A1%2C%20quero%20anunciar%20no%20Portal%20dos%20Cerrados.">Falar pelo WhatsApp</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <button data-page="home" class="active" onclick="goPage('home',this)"><span class="ico"><i class="fa-solid fa-house"></i></span>Início</button>
+    <button data-page="feed" onclick="goPage('feed',this)"><span class="ico"><i class="fa-solid fa-play"></i></span>Feed</button>
+    <button data-page="channels" onclick="goPage('channels',this)"><span class="ico"><i class="fa-solid fa-table-cells-large"></i></span>Canais</button>
+    <button data-page="search" onclick="goPage('search',this)"><span class="ico"><i class="fa-solid fa-magnifying-glass"></i></span>Buscar</button>
+    <button data-page="advertise" onclick="goPage('advertise',this)"><span class="ico"><i class="fa-solid fa-bullhorn"></i></span>Anunciar</button>
+  </nav>
+</div>
+
+<div id="sheetBackdrop" class="sheetBackdrop" onclick="closeSheet()"></div>
+<article id="articleSheet" class="sheet"><div class="sheetHandle"></div><div id="articleContent" class="article"></div></article>
+
+<div id="authModal" class="modal hide">
+  <div class="modalCard">
+    <div class="row"><h2 id="authTitle">Entrar</h2><div class="grow"></div><button class="iconbtn" onclick="closeAuth()"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="signupFields" class="hide">
+      <div class="field"><label>Cidade</label><select id="signupCity"></select></div>
+    </div>
+    <div class="field"><label>E-mail</label><input id="authEmail" type="email" autocomplete="email"></div>
+    <div class="field"><label>Senha</label><input id="authPassword" type="password" autocomplete="current-password"></div>
+    <button id="authSubmit" class="btn primary" style="width:100%" onclick="submitAuth()">Entrar</button>
+    <button class="btn ghost" style="width:100%;margin-top:8px" onclick="openForgot()">Esqueci minha senha</button>
+    <p class="muted" style="font-size:12px">Ao continuar, você concorda com o uso básico dos dados para manter sua conta e personalizar o conteúdo.</p>
+  </div>
+</div>
+
+<div id="forgotModal" class="modal hide">
+  <div class="modalCard">
+    <div class="row"><h2>Recuperar acesso</h2><div class="grow"></div><button class="iconbtn" onclick="toggle('forgotModal',false)"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="field"><label>E-mail</label><input id="forgotEmail" type="email" autocomplete="email"></div>
+    <div id="forgotStatus" class="muted" style="font-size:12px;min-height:18px;margin-bottom:8px"></div>
+    <button id="sendResetBtn" class="btn primary" style="width:100%" onclick="requestReset()">Enviar código</button>
+    <div id="resetStep" class="hide">
+      <div class="field"><label>Código recebido</label><input id="resetCode" maxlength="6"></div>
+      <div class="field"><label>Nova senha</label><input id="resetPassword" type="password"></div>
+      <button class="btn primary" style="width:100%" onclick="confirmReset()">Alterar senha</button>
+    </div>
+  </div>
+</div>
+
+<div id="commentsModal" class="modal hide">
+  <div class="modalCard">
+    <div class="row"><h2>Comentários</h2><div class="grow"></div><button class="iconbtn" onclick="closeComments()"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="replyBar" class="replyBar hide"><span id="replyLabel"></span><div class="grow"></div><button class="iconbtn" style="padding:5px 8px" onclick="cancelReply()"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="commentsList"></div>
+    <div class="field"><textarea id="commentText" rows="3" placeholder="Adicione um comentário..."></textarea></div>
+    <button class="btn primary" style="width:100%" onclick="sendComment()">Publicar</button>
+  </div>
+</div>
+
+<aside id="menuPanel" class="menuPanel">
+  <img class="menuLogo" src="https://i.ibb.co/qYjK5r1G/Chat-GPT-Image-21-de-ago-de-2026-19-07-46-removebg-preview-1.png" alt="Portal dos Cerrados"><div class="row"><h2>Minha conta</h2><div class="grow"></div><button class="iconbtn" onclick="openMenu(false)"><i class="fa-solid fa-xmark"></i></button></div>
+  <div id="accountSummary" class="card" style="min-height:auto;padding:15px;margin:14px 0"></div>
+  <button onclick="openAccount()"><i class="fa-solid fa-user"></i> Dados da conta</button>
+  <button onclick="goPage('channels');openMenu(false)"><i class="fa-solid fa-star"></i> Canais que sigo</button>
+  <button onclick="goPage('advertise');openMenu(false)"><i class="fa-solid fa-bullhorn"></i> Anunciar no portal</button>
+  <a target="_blank" rel="noopener noreferrer" href="https://wa.me/5589994372011?text=Ol%C3%A1%2C%20preciso%20de%20suporte%20no%20Portal%20dos%20Cerrados."><i class="fa-solid fa-comment-dots"></i> Falar com suporte</a>
+  <button onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+  <button onclick="deleteAccount()" style="color:#ff8c92"><i class="fa-solid fa-trash-can"></i> Excluir conta</button>
+</aside>
+
+<script src="script.js"></script>
+</body>
+</html>
