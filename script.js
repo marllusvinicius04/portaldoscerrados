@@ -743,3 +743,90 @@ window.addEventListener('blur',()=>{
 document.addEventListener('DOMContentLoaded',()=>setTimeout(pauseAllFeedVideos,0));
 
 boot();
+
+/* ===== OUViR MATÉRIA - módulo autônomo (HTML/CSS criados pelo próprio JS) ===== */
+(function(){
+  if(document.getElementById('pcSpeechStyles')) return;
+
+  const style=document.createElement('style');
+  style.id='pcSpeechStyles';
+  style.textContent=`
+    .articleSpeechBar{position:sticky;top:0;z-index:50;display:flex;justify-content:flex-end;gap:8px;width:min(800px,100%);margin:0 auto;padding:8px 20px 4px;background:linear-gradient(180deg,rgba(247,245,239,.98) 72%,rgba(247,245,239,0))}
+    .articleSpeechBtn,.articleSpeechStop{border:1px solid rgba(33,129,82,.20);background:#e8f5ed;color:#145c3a;min-height:42px;border-radius:999px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;cursor:pointer}
+    .articleSpeechStop{width:42px;padding:0}
+    .articleSpeechBtn.speaking{background:#1DD96C;color:#001A21}
+    .articleSpeechHidden{display:none!important}
+    @media(max-width:520px){.articleSpeechBar{padding-left:14px;padding-right:14px}.articleSpeechBtn{font-size:13px}}
+  `;
+  document.head.appendChild(style);
+
+  let speech={utterance:null,speaking:false,paused:false};
+
+  function text(){
+    const root=document.getElementById('articleContent');
+    return root ? (root.innerText||root.textContent||'').replace(/\s+/g,' ').trim() : '';
+  }
+  function voice(){
+    const v=speechSynthesis.getVoices();
+    return v.find(x=>/^pt-BR$/i.test(x.lang))||v.find(x=>/^pt/i.test(x.lang))||null;
+  }
+  function bar(){
+    let b=document.getElementById('articleSpeechBar');
+    if(b) return b;
+    const content=document.getElementById('articleContent');
+    if(!content) return null;
+    b=document.createElement('div');
+    b.id='articleSpeechBar';
+    b.className='articleSpeechBar articleSpeechHidden';
+    b.innerHTML=`<button id="speakArticleBtn" class="articleSpeechBtn" type="button"><i class="fa-solid fa-volume-high"></i><span>Ouvir matéria</span></button>
+      <button id="stopArticleSpeechBtn" class="articleSpeechStop articleSpeechHidden" type="button" aria-label="Parar leitura"><i class="fa-solid fa-stop"></i></button>`;
+    content.parentNode.insertBefore(b,content);
+    b.querySelector('#speakArticleBtn').onclick=toggle;
+    b.querySelector('#stopArticleSpeechBtn').onclick=stop;
+    return b;
+  }
+  function ui(){
+    const b=bar(), btn=b?.querySelector('#speakArticleBtn'), stopBtn=b?.querySelector('#stopArticleSpeechBtn');
+    if(!b||!btn) return;
+    b.classList.toggle('articleSpeechHidden',!text());
+    const i=btn.querySelector('i'), span=btn.querySelector('span');
+    btn.classList.toggle('speaking',speech.speaking);
+    if(speech.speaking&&!speech.paused){
+      i.className='fa-solid fa-pause'; span.textContent='Pausar'; stopBtn.classList.remove('articleSpeechHidden');
+    }else if(speech.speaking&&speech.paused){
+      i.className='fa-solid fa-play'; span.textContent='Continuar'; stopBtn.classList.remove('articleSpeechHidden');
+    }else{
+      i.className='fa-solid fa-volume-high'; span.textContent='Ouvir matéria'; stopBtn.classList.add('articleSpeechHidden');
+    }
+  }
+  function toggle(){
+    if(!('speechSynthesis' in window)){ if(typeof toast==='function') toast('Leitura em voz alta indisponível neste navegador.'); return; }
+    if(speech.speaking){
+      if(speech.paused){speechSynthesis.resume();speech.paused=false}
+      else{speechSynthesis.pause();speech.paused=true}
+      ui(); return;
+    }
+    const t=text();
+    if(!t) return;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(t);
+    u.lang='pt-BR';u.rate=1;u.pitch=1;u.volume=1;
+    const v=voice();if(v)u.voice=v;
+    u.onstart=()=>{speech.speaking=true;speech.paused=false;ui()};
+    u.onend=u.onerror=()=>{speech.speaking=false;speech.paused=false;speech.utterance=null;ui()};
+    speech.utterance=u;speech.speaking=true;speech.paused=false;ui();speechSynthesis.speak(u);
+  }
+  function stop(){
+    if('speechSynthesis' in window)speechSynthesis.cancel();
+    speech.speaking=false;speech.paused=false;speech.utterance=null;ui();
+  }
+
+  bar();
+  const content=document.getElementById('articleContent');
+  if(content)new MutationObserver(()=>{stop();ui()}).observe(content,{childList:true,subtree:true});
+  const backdrop=document.getElementById('sheetBackdrop');
+  if(backdrop)backdrop.addEventListener('click',stop);
+  window.addEventListener('beforeunload',stop);
+  window.pcStopArticleSpeech=stop;
+  ui();
+})();
