@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portal dos Cerrados — Gerente</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="loading" class="loading hide"><div><div class="spinner"></div><p>Sincronizando...</p></div></div>
+<div id="toast" class="toast hide"></div>
+<div id="uploadProgressBox" class="hide" style="position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:120;width:min(420px,90vw);background:#06272d;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px">
+  <div style="display:flex;justify-content:space-between;gap:12px"><b>Enviando mídia</b><span id="uploadPct">0%</span></div>
+  <div style="height:7px;background:#0A3036;border-radius:99px;overflow:hidden;margin-top:9px"><div id="uploadBar" style="height:100%;width:0;background:#1DD96C;transition:width .12s"></div></div>
+</div>
+
+<section id="login" class="login">
+  <div class="loginCard">
+    <img class="loginLogo" src="https://i.ibb.co/qYjK5r1G/Chat-GPT-Image-21-de-ago-de-2026-19-07-46-removebg-preview-1.png" alt="Portal dos Cerrados">
+    <h1>Painel gerente</h1><p class="muted">Gerencie cidades, pautas, usuários e anúncios.</p>
+    <div class="field"><label>Senha</label><input id="adminPass" type="password" value=""></div>
+    <button class="btn primary" style="width:100%" onclick="login()"><i class="fa-solid fa-lock-open"></i> Entrar</button>
+  </div>
+</section>
+
+<section id="shell" class="shell hide">
+  <aside class="side">
+    <img class="adminLogo" src="https://i.ibb.co/qYjK5r1G/Chat-GPT-Image-21-de-ago-de-2026-19-07-46-removebg-preview-1.png" alt="Portal dos Cerrados">
+    <button class="btn primary" onclick="go('dashboard')"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
+    <button class="btn" onclick="go('news')"><i class="fa-solid fa-pen-to-square"></i> Publicar pauta</button>
+    <button class="btn" onclick="go('control')"><i class="fa-solid fa-newspaper"></i> Notícias</button>
+    <button class="btn" onclick="go('cities')"><i class="fa-solid fa-location-dot"></i> Cidades</button>
+    <button class="btn" onclick="go('users')"><i class="fa-solid fa-users"></i> Usuários</button>
+    <button class="btn" onclick="go('notifications')"><i class="fa-solid fa-bell"></i> Disparar notificação</button>
+    <button class="btn" onclick="go('ads')"><i class="fa-solid fa-circle-plus"></i> Criar ADS</button>
+    <button class="btn" onclick="go('adcontrol')"><i class="fa-solid fa-bullhorn"></i> Ver ADS</button>
+    <button class="btn" onclick="adminLogout()"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+  </aside>
+
+  <main class="main">
+    <div class="top"><h2 id="pageTitle">Dashboard</h2><div class="grow"></div><button class="btn" onclick="refresh()"><i class="fa-solid fa-rotate"></i> Atualizar</button></div>
+
+    <section id="page-dashboard" class="page active">
+      <div class="grid">
+        <div class="card span4"><div class="muted">Usuários</div><h1 id="kUsers">0</h1></div>
+        <div class="card span4"><div class="muted">Pautas</div><h1 id="kNews">0</h1></div>
+        <div class="card span4"><div class="muted">ADS ativos</div><h1 id="kAds">0</h1></div>
+        <div class="card span12"><h3>Últimas pautas</h3><div id="dashLatest"></div></div>
+      </div>
+    </section>
+
+    <section id="page-news" class="page">
+      <div class="grid">
+        <div class="card span6">
+          <h3>Dados da pauta</h3>
+          <input id="newsId" type="hidden">
+          <div class="field"><label>Cidade</label><select id="newsCity"></select></div>
+          <div class="field"><label>Categoria / canal</label><select id="newsCategory">
+            <option>Politica</option><option>Educacao</option><option>Cultura</option><option>Agro</option><option>Esporte</option><option>Negocios</option><option>Entretenimento</option>
+          </select></div>
+          <div class="field"><label>Título</label><input id="newsTitle"></div>
+          <div class="field"><label>Resumo</label><textarea id="newsSummary" style="min-height:90px"></textarea></div>
+          <div class="field"><label>Mídia principal</label><select id="newsMediaType"><option value="video">Vídeo</option><option value="image">Imagem</option></select></div>
+          <div class="field"><label>URL da mídia</label><input id="newsMedia" placeholder="https://..."></div><input id="newsMediaFileId" type="hidden">
+          <div class="field"><label>Ou subir vídeo/imagem</label><input id="newsMediaFile" type="file" accept="image/*,video/*"><button class="btn" onclick="uploadNewsMedia()"><i class="fa-solid fa-cloud-arrow-up"></i> Enviar mídia</button></div>
+          <p class="muted" style="font-size:12px">Não é necessário criar capa. A mídia é enviada para CDN; vídeos geram prévia automaticamente e imagens usam a própria imagem.</p>
+        </div>
+        <div class="card span6">
+          <h3>Editor da pauta</h3>
+          <div class="toolbar">
+            <button class="btn" onclick="cmd('bold')"><b>B</b></button><button class="btn" onclick="cmd('italic')"><i>I</i></button>
+            <button class="btn" onclick="cmd('formatBlock','h2')">H2</button><button class="btn" onclick="cmd('formatBlock','p')">P</button>
+            <button class="btn" onclick="cmd('insertUnorderedList')">• Lista</button><button class="btn" onclick="cmd('formatBlock','blockquote')">❝ Citação</button>
+            <button class="btn" onclick="insertLink()">Link</button>
+          </div>
+          <div id="newsBody" class="editor" contenteditable="true"><h2>Subtítulo da pauta</h2><p>Escreva ou cole aqui todo o conteúdo da matéria.</p></div>
+          <button class="btn primary" style="width:100%;margin-top:12px" onclick="saveNews()"><i class="fa-solid fa-paper-plane"></i> Publicar pauta</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-control" class="page"><div class="card"><h3>Controle de notícias</h3><div style="overflow:auto"><table><thead><tr><th>Cidade</th><th>Canal</th><th>Título</th><th>Status</th><th>Ações</th></tr></thead><tbody id="newsTable"></tbody></table></div></div></section>
+
+    <section id="page-cities" class="page">
+      <div class="grid"><div class="card span4"><h3>Nova cidade</h3><div class="field"><input id="cityName" placeholder="Nome da cidade"></div><button class="btn primary" onclick="saveCity()"><i class="fa-solid fa-location-dot"></i> Adicionar cidade</button></div>
+      <div class="card span8"><h3>Cidades cadastradas</h3><div id="citiesList"></div></div></div>
+    </section>
+
+    <section id="page-users" class="page"><div class="card"><h3>Usuários cadastrados</h3><div style="overflow:auto"><table><thead><tr><th>E-mail</th><th>Cidade</th><th>Canais seguidos</th><th>Cadastro</th></tr></thead><tbody id="usersTable"></tbody></table></div></div></section>
+
+    <section id="page-notifications" class="page">
+      <div class="grid">
+        <div class="card span6">
+          <h3><i class="fa-solid fa-bell sectionIcon"></i>Disparar notificação</h3>
+          <p class="muted">Envie uma chamada profissional por e-mail para todos os usuários ou somente para uma cidade.</p>
+
+          <div class="field">
+            <label>Público</label>
+            <select id="notifyAudience" onchange="toggleNotifyCity()">
+              <option value="all">Todos os usuários</option>
+              <option value="city">Somente uma cidade</option>
+            </select>
+          </div>
+
+          <div id="notifyCityWrap" class="field hide">
+            <label>Cidade</label>
+            <select id="notifyCity"></select>
+          </div>
+
+          <div class="field">
+            <label>Título da notificação</label>
+            <input id="notifyTitle" maxlength="120" placeholder="Ex.: Plantão: nova pauta disponível">
+          </div>
+
+          <div class="field">
+            <label>Mensagem</label>
+            <textarea id="notifyBody" maxlength="1200" placeholder="Escreva a chamada que o usuário receberá no e-mail..."></textarea>
+          </div>
+
+          <div class="field">
+            <label>Texto do botão</label>
+            <input id="notifyButtonText" maxlength="40" value="Acessar Portal dos Cerrados">
+          </div>
+
+          <button class="btn primary" style="width:100%" onclick="previewNotification()"><i class="fa-solid fa-eye"></i> Atualizar prévia</button>
+          <button class="btn" style="width:100%;margin-top:8px" onclick="sendNotification()"><i class="fa-solid fa-paper-plane"></i> Disparar notificação</button>
+
+          <p class="muted" style="font-size:12px;margin-top:10px">
+            O envio respeita o limite diário de e-mails disponível na sua conta Google Apps Script.
+          </p>
+        </div>
+
+        <div class="card span6">
+          <div class="top" style="margin:0 0 12px">
+            <h3 style="margin:0"><i class="fa-solid fa-envelope-open-text sectionIcon"></i>Prévia do e-mail</h3>
+            <div class="grow"></div>
+            <span id="notifyEstimate" class="pill">0 destinatários</span>
+          </div>
+          <div id="notifyPreview" style="background:#f4f7f5;border-radius:18px;padding:18px;color:#0a1f24">
+            <div style="background:#001A21;border-radius:16px;padding:22px;overflow:hidden">
+              <img src="https://i.ibb.co/qYjK5r1G/Chat-GPT-Image-21-de-ago-de-2026-19-07-46-removebg-preview-1.png" alt="Portal dos Cerrados" style="max-width:230px;width:68%;height:auto;display:block;margin-bottom:18px">
+              <h2 id="previewNotifyTitle" style="margin:10px 0;color:#FAFAF7">Sua notificação aparecerá aqui</h2>
+              <p id="previewNotifyBody" style="color:#dce7e4;line-height:1.55">Escreva uma mensagem para visualizar a prévia.</p>
+              <div style="display:inline-block;margin-top:8px;background:#1DD96C;color:#001A21;border-radius:12px;padding:11px 15px;font-weight:800">
+                <span id="previewNotifyButton">Acessar Portal dos Cerrados</span>
+              </div>
+            </div>
+            <p style="font-size:11px;color:#697b7e;margin:12px 4px 0">portaldoscerrados.com.br</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="page-ads" class="page">
+      <div class="grid">
+        <div class="card span6">
+          <h3>Novo anúncio</h3>
+          <input id="adId" type="hidden">
+          <div class="field"><label>Cidade</label><select id="adCity"></select></div>
+          <div class="field"><label>Empresa</label><input id="adCompany"></div>
+          <div class="field"><label>Título</label><input id="adTitle"></div>
+          <div class="field"><label>URL do vídeo/imagem</label><input id="adMedia"></div><input id="adMediaFileId" type="hidden">
+          <div class="field"><label>Ou subir mídia</label><input id="adFile" type="file" accept="image/*,video/*"><button class="btn" onclick="uploadTo('adFile','adMedia')"><i class="fa-solid fa-cloud-arrow-up"></i> Enviar mídia</button></div>
+          <div class="field"><label>Tipo</label><select id="adMediaType"><option value="video">Vídeo</option><option value="image">Imagem</option></select></div>
+          <div class="field"><label>Botão</label><select id="adButtonText"><option>Falar conosco</option><option>Comprar agora</option><option>Ver informações</option></select></div>
+          <div class="field"><label>Link de direcionamento</label><input id="adLink" placeholder="https://..."></div>
+          <div class="field"><label>Aparecer a cada quantas pautas</label><input id="adFrequency" type="number" min="1" value="3"></div>
+          <div class="field"><label>Duração em dias</label><input id="adDays" type="number" min="1" value="7"></div>
+          <button class="btn primary" style="width:100%" onclick="saveAd()"><i class="fa-solid fa-bullhorn"></i> Ativar anúncio</button>
+        </div>
+        <div class="card span6"><h3>ADS no sistema</h3><div id="adsList"></div></div>
+      </div>
+    </section>
+    <section id="page-adcontrol" class="page">
+      <div class="card">
+        <div class="top" style="margin:0 0 12px"><h3 style="margin:0">Controle de ADS</h3><div class="grow"></div><span class="muted">Veja os anúncios e tire do ar quando quiser.</span></div>
+        <div style="overflow:auto">
+          <table><thead><tr><th>Empresa</th><th>Cidade</th><th>Status</th><th>Expira</th><th>Frequência</th><th>Ações</th></tr></thead><tbody id="adsTable"></tbody></table>
+        </div>
+      </div>
+    </section>
+  </main>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
