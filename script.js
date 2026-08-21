@@ -249,10 +249,10 @@ function newsFeed(n){
     <div class="feedMeta"><span class="eyebrow">${safe(n.category)} • ${safe(n.city)}</span><h2>${safe(n.title)}</h2><p>${safe(n.summary||'')}</p>
       <button class="btn primary" onclick="openArticle('${n.id}')">Ver pauta completa</button></div>
     <div class="feedActions">
-      <button class="soundBtn" onclick="toggleFeedSound(event)">${state.feedSoundOn?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>'}<small>${state.feedSoundOn?'Som':'Sem som'}</small></button>
-      <button onclick="openComments('${n.id}')"><i class="fa-solid fa-comment-dots"></i><small>Comentários</small></button>
-      <button onclick="shareNews('${n.id}')"><i class="fa-solid fa-share-nodes"></i><small>Compartilhar</small></button>
-      <button><span class="onlineDot" style="display:inline-block"></span><small><span class="onlineCount">${state.online||0}</span> online</small></button>
+      <button class="soundBtn" aria-label="${state.feedSoundOn?'Desativar som':'Ativar som'}" title="${state.feedSoundOn?'Desativar som':'Ativar som'}" onclick="toggleFeedSound(event)">${state.feedSoundOn?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>'}</button>
+      <button aria-label="Comentários" title="Comentários" onclick="openComments('${n.id}')"><i class="fa-solid fa-comment-dots"></i></button>
+      <button aria-label="Compartilhar" title="Compartilhar" onclick="shareNews('${n.id}')"><i class="fa-solid fa-share-nodes"></i></button>
+      <button class="onlineAction" aria-label="${state.online||0} pessoas online" title="${state.online||0} online"><span class="onlineDot" style="display:inline-block"></span><span class="onlineCount">${state.online||0}</span></button>
     </div>
     <div class="feedTapState"><i class="fa-solid fa-pause"></i></div>
     <div class="feedSeek"><span class="feedSeekFill"></span></div>
@@ -264,7 +264,7 @@ function adFeed(a){
     <span class="eyebrow">ANÚNCIO PRA VOCÊ</span><h2>${safe(a.company)}</h2><p>${safe(a.title)}</p>
     <a class="btn primary" style="display:inline-block;text-decoration:none" href="${safe(a.link)}" target="_blank" rel="noopener noreferrer">${safe(a.buttonText||'Ver informações')}</a>
   </div>
-  <div class="feedActions"><button class="soundBtn" onclick="toggleFeedSound(event)">${state.feedSoundOn?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>'}<small>${state.feedSoundOn?'Som':'Sem som'}</small></button></div><div class="feedTapState"><i class="fa-solid fa-pause"></i></div><div class="feedSeek"><span class="feedSeekFill"></span></div></article>`;
+  <div class="feedActions"><button class="soundBtn" aria-label="${state.feedSoundOn?'Desativar som':'Ativar som'}" title="${state.feedSoundOn?'Desativar som':'Ativar som'}" onclick="toggleFeedSound(event)">${state.feedSoundOn?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>'}</button></div><div class="feedTapState"><i class="fa-solid fa-pause"></i></div><div class="feedSeek"><span class="feedSeekFill"></span></div></article>`;
 }
 let feedGestureBound=false, touchStartY=0;
 async function refreshFeed(){
@@ -406,7 +406,7 @@ function applyFeedSound(){
     }
   });
   $$('.soundBtn').forEach(btn=>{
-    btn.innerHTML=`${state.feedSoundOn?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>'}<small>${state.feedSoundOn?'Som':'Sem som'}</small>`;
+    btn.innerHTML=state.feedSoundOn?'<i class="fa-solid fa-volume-high"></i>':'<i class="fa-solid fa-volume-xmark"></i>'; btn.setAttribute('aria-label',state.feedSoundOn?'Desativar som':'Ativar som'); btn.title=state.feedSoundOn?'Desativar som':'Ativar som';
   });
 }
 
@@ -524,14 +524,24 @@ function setupVideoObserver(){
 function openArticle(id){
   pauseAllFeedVideos();
   const n=state.news.find(x=>x.id===id); if(!n)return; state.currentNews=n;
-  $('#articleContent').innerHTML=`<div class="tag">${safe(n.category)} • ${safe(n.city)} • ${fmtDate(n.publishedAt)}</div><h1>${safe(n.title)}</h1><p class="lead">${safe(n.summary||'')}</p>
-  ${n.cover?`<img src="${safe(imageUrl(n.cover,n.coverFileId))}" onerror="this.style.display='none'">`:''}
-  ${n.video?`<video src="${safe(videoUrl(n.video,n.videoFileId))}" controls playsinline style="width:100%;max-height:70vh;border-radius:18px;background:#000;margin:14px 0"></video>`:''}
+  $('#articleContent').innerHTML=`<div class="articleToolbar"><button class="articleToolBtn" onclick="toggleReadingMode()" aria-label="Ativar modo leitura"><i class="fa-solid fa-book-open"></i><span>Modo leitura</span></button><button class="articleCloseBtn" onclick="closeSheet()" aria-label="Fechar pauta" title="Fechar pauta"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="tag">${safe(n.category)} • ${safe(n.city)} • ${fmtDate(n.publishedAt)}</div><h1>${safe(n.title)}</h1><p class="lead">${safe(n.summary||'')}</p>
+  <div class="articleMedia">${n.cover?`<img src="${safe(imageUrl(n.cover,n.coverFileId))}" onerror="this.style.display='none'">`:''}
+  ${n.video?`<video src="${safe(videoUrl(n.video,n.videoFileId))}" controls playsinline style="width:100%;max-height:70vh;border-radius:18px;background:#000;margin:14px 0"></video>`:''}</div>
   <div class="body">${n.body||''}</div>
-  <div class="row" style="margin-top:24px"><button class="btn primary" onclick="shareNews('${n.id}')">Compartilhar</button><button class="btn ghost" onclick="openComments('${n.id}')">Comentários</button></div>`;
+  <div class="row articleFooterActions" style="margin-top:24px"><button class="btn primary" onclick="shareNews('${n.id}')"><i class="fa-solid fa-share-nodes"></i> Compartilhar</button><button class="btn ghost" onclick="openComments('${n.id}')"><i class="fa-solid fa-comment-dots"></i> Comentários</button></div>`;
+  $('#articleSheet').classList.remove('readingMode');
+  $('#articleSheet').scrollTop=0;
   $('#articleSheet').classList.add('open'); $('#sheetBackdrop').classList.add('open'); document.body.style.overflow='hidden';
 }
-function closeSheet(){ $('#articleSheet').classList.remove('open'); $('#sheetBackdrop').classList.remove('open'); document.body.style.overflow=''; if($('#page-feed')?.classList.contains('active')) requestAnimationFrame(activateVisibleFeedVideo); }
+function toggleReadingMode(){
+  const sheet=$('#articleSheet');
+  const active=sheet.classList.toggle('readingMode');
+  sheet.querySelectorAll('video,audio').forEach(m=>{ try{m.pause()}catch{} });
+  const btn=sheet.querySelector('.articleToolBtn');
+  if(btn){ btn.innerHTML=active?'<i class="fa-solid fa-eye"></i><span>Ver mídia</span>':'<i class="fa-solid fa-book-open"></i><span>Modo leitura</span>'; btn.setAttribute('aria-label',active?'Sair do modo leitura':'Ativar modo leitura'); }
+}
+function closeSheet(){ $('#articleSheet').classList.remove('open','readingMode'); $('#sheetBackdrop').classList.remove('open'); document.body.style.overflow=''; if($('#page-feed')?.classList.contains('active')) requestAnimationFrame(activateVisibleFeedVideo); }
 
 function avatarLabel(email=''){ return (String(email).split('@')[0]||'U').slice(0,2).toUpperCase(); }
 function commentHtml(c,replies=[]){
