@@ -277,3 +277,173 @@ img,video,iframe{max-width:100%}
   .searchBox{align-items:stretch}
   .searchBox .btn{padding-inline:13px}
 }
+
+
+/* ===== V13.1: correção de respiro lateral / cards / busca ===== */
+
+/* Evita qualquer elemento de busca ou grid estourar a largura útil */
+#page-search,
+#page-search .container,
+#page-search .section,
+#searchResults,
+#searchSuggestionsWrap,
+#searchSuggestions{
+  min-width:0;
+  max-width:100%;
+}
+
+/* Dá margem visual real nas laterais da tela de busca */
+#page-search .container{
+  padding-left:clamp(14px,3vw,26px);
+  padding-right:clamp(14px,3vw,26px);
+}
+
+/* Campo de busca sem encostar nem cortar nas laterais */
+.searchBox{
+  width:100%;
+  min-width:0;
+  display:flex;
+  align-items:stretch;
+  gap:8px;
+  margin:4px 0 20px;
+  padding:0;
+}
+.searchBox input{
+  flex:1 1 auto;
+  width:100%;
+  min-width:0;
+}
+.searchBox .btn{
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+
+/* Resultados e sugestões com cards sempre contidos */
+#searchResults:not(:empty),
+.searchSuggestions{
+  width:100%;
+  min-width:0;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+#searchResults .card,
+.searchSuggestions .card{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+}
+
+/* Evita imagem/texto forçando o card para fora */
+#searchResults .card img,
+#searchResults .card video,
+.searchSuggestions .card img,
+.searchSuggestions .card video{
+  width:100%;
+  max-width:100%;
+  display:block;
+}
+
+/* Categorias/canais com respiro nas bordas e snap mais natural */
+#channels,
+#channelsGrid{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  padding-left:2px;
+  padding-right:2px;
+  scroll-padding-left:2px;
+  scroll-padding-right:2px;
+}
+#channels .channelCard,
+#channelsGrid .channelCard{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+}
+
+/* Também evita cortes nos scrollers da home */
+#highlights,
+#likedForYou,
+#latest{
+  min-width:0;
+  max-width:100%;
+  padding-left:2px;
+  padding-right:2px;
+}
+
+/* Tablet */
+@media(max-width:760px){
+  #searchResults:not(:empty),
+  .searchSuggestions{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+
+  #channels,
+  #channelsGrid{
+    grid-auto-columns:minmax(0,calc(100% - 30px))!important;
+  }
+}
+
+/* Celular */
+@media(max-width:520px){
+  #page-search .container{
+    padding-left:14px;
+    padding-right:14px;
+  }
+
+  .searchBox{
+    gap:7px;
+  }
+
+  .searchBox input{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  .searchBox .btn{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  #searchResults:not(:empty),
+  .searchSuggestions{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  #channels,
+  #channelsGrid{
+    grid-auto-columns:minmax(0,calc(100% - 20px))!important;
+  }
+
+  #highlights,
+  #likedForYou,
+  #latest{
+    grid-auto-columns:minmax(0,calc(100% - 20px))!important;
+  }
+}
+
+/* Celulares bem estreitos */
+@media(max-width:380px){
+  .searchBox{
+    display:grid;
+    grid-template-columns:1fr auto;
+  }
+
+  #page-search .container{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  #channels,
+  #channelsGrid,
+  #highlights,
+  #likedForYou,
+  #latest{
+    grid-auto-columns:minmax(0,calc(100% - 14px))!important;
+  }
+}
+
