@@ -92,8 +92,12 @@
 
     <section id="page-search" class="page">
       <div class="container section">
-        <div class="searchBox"><input id="searchInput" placeholder="Buscar pauta, cidade ou canal..."><button class="btn primary" onclick="doSearch()">Buscar</button></div>
+        <div class="searchBox"><input id="searchInput" placeholder="Buscar pauta, cidade ou canal..." onkeydown="if(event.key==='Enter')doSearch()" oninput="if(!this.value.trim()){document.getElementById('searchResults').innerHTML='';renderSearchSuggestions()}"><button class="btn primary" onclick="doSearch()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button></div>
         <div id="searchResults" class="section"></div>
+        <section id="searchSuggestionsWrap" class="searchSuggestionsWrap">
+          <div class="sectionTitle"><h2>Sugestões para você</h2><span class="muted">pautas que podem te interessar</span></div>
+          <div id="searchSuggestions" class="searchSuggestions"></div>
+        </section>
       </div>
     </section>
 
@@ -122,16 +126,26 @@
 <article id="articleSheet" class="sheet"><div class="sheetHandle"></div><div id="articleContent" class="article"></div></article>
 
 <div id="authModal" class="modal hide">
-  <div class="modalCard">
-    <div class="row"><h2 id="authTitle">Entrar</h2><div class="grow"></div><button class="iconbtn" onclick="closeAuth()"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="modalCard authExperience">
+    <div class="authBrand">
+      <img src="https://i.ibb.co/qYjK5r1G/Chat-GPT-Image-21-de-ago-de-2026-19-07-46-removebg-preview-1.png" alt="Portal dos Cerrados">
+      <button class="iconbtn authClose" onclick="closeAuth()" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="authIcon"><i class="fa-solid fa-user-plus"></i></div>
+    <h2 id="authTitle">Criar conta grátis</h2>
+    <p id="authContext" class="authContext">Crie sua conta gratuitamente para interagir com o Portal dos Cerrados.</p>
+    <div class="authTabs">
+      <button id="authTabSignup" type="button" class="active" onclick="openAuth('signup')">Criar conta</button>
+      <button id="authTabLogin" type="button" onclick="openAuth('login')">Já tenho conta</button>
+    </div>
     <div id="signupFields" class="hide">
       <div class="field"><label>Cidade</label><select id="signupCity"></select></div>
     </div>
-    <div class="field"><label>E-mail</label><input id="authEmail" type="email" autocomplete="email"></div>
-    <div class="field"><label>Senha</label><input id="authPassword" type="password" autocomplete="current-password"></div>
-    <button id="authSubmit" class="btn primary" style="width:100%" onclick="submitAuth()">Entrar</button>
-    <button class="btn ghost" style="width:100%;margin-top:8px" onclick="openForgot()">Esqueci minha senha</button>
-    <p class="muted" style="font-size:12px">Ao continuar, você concorda com o uso básico dos dados para manter sua conta e personalizar o conteúdo.</p>
+    <div class="field"><label>E-mail</label><input id="authEmail" type="email" autocomplete="email" placeholder="seu@email.com"></div>
+    <div class="field"><label>Senha</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Sua senha"></div>
+    <button id="authSubmit" class="btn primary" style="width:100%" onclick="submitAuth()">Criar conta</button>
+    <button id="forgotBtn" class="btn ghost" style="width:100%;margin-top:8px" onclick="openForgot()">Esqueci minha senha</button>
+    <p class="muted authLegal">Você pode acessar e ler o Portal sem conta. O cadastro é necessário apenas para interações e personalização.</p>
   </div>
 </div>
 
