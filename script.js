@@ -15,6 +15,22 @@ const CHANNELS = [
 ];
 
 let state = { user:null, cities:[], news:[], ads:[], feed:[], followed:[], currentNews:null, authMode:'login', currentCommentNewsId:null, replyTo:null, online:0, feedNonce:Date.now(), feedSoundOn:localStorage.getItem('pc_feed_sound')==='1' };
+
+let onlineFallbackValue = 45 + Math.floor(Math.random()*6);
+
+function setOnlineFromReal(realValue,reroll=false){
+  const real=Math.max(0,Number(realValue||0));
+  if(real>=50){
+    state.online=real;
+  }else{
+    if(reroll || !Number.isFinite(onlineFallbackValue) || onlineFallbackValue<45 || onlineFallbackValue>50){
+      onlineFallbackValue=45+Math.floor(Math.random()*6);
+    }
+    state.online=onlineFallbackValue;
+  }
+  updateOnline();
+}
+
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
@@ -44,7 +60,7 @@ async function boot(){
     }
     if(!API_URL.includes('COLE_AQUI')){
       const data = await api('bootstrap',{city:localStorage.getItem('pc_city')||''});
-      state.cities=data.cities||[]; state.news=data.news||[]; state.ads=data.ads||[]; state.online=data.online||0;
+      state.cities=data.cities||[]; state.news=data.news||[]; state.ads=data.ads||[]; setOnlineFromReal(data.online,true);
       localStorage.setItem('pc_boot',JSON.stringify({ts:Date.now(),cities:state.cities,news:state.news,ads:state.ads}));
       if(data.user){ state.user=data.user; state.followed=data.user.followed||[]; localStorage.setItem('pc_city',data.user.city||''); }
       fillCities(); personalize(); renderAll();
@@ -52,15 +68,16 @@ async function boot(){
       demoData(); fillCities(); personalize(); renderAll();
     }
     const hasSession = !!localStorage.getItem('pc_token');
-    if(!hasSession) toggle('preview',true);
-    else if(!state.user && !API_URL.includes('COLE_AQUI')) await restoreSession();
+    toggle('preview',false);
+    if(hasSession && !state.user && !API_URL.includes('COLE_AQUI')) await restoreSession();
     updateAccount();
     startHeartbeat();
-  }catch(e){ toast(e.message); if(!localStorage.getItem('pc_token')) toggle('preview',true); }
+  }catch(e){ toast(e.message); toggle('preview',false); }
   finally{ setTimeout(()=>loading(false),350); }
 }
 
 function demoData(){
+  setOnlineFromReal(0,true);
   state.cities=['Uruçuí','Benedito Leite','Baixa Grande do Ribeiro','Ribeiro Gonçalves'];
   state.news=[
     {id:'n1',city:'Uruçuí',category:'Politica',title:'Novas pautas movimentam a semana em Uruçuí',summary:'Veja os principais assuntos em debate na cidade.',cover:'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80',video:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',body:'<h2>Informação com contexto</h2><p>Esta é uma matéria demonstrativa para visualizar o formato editorial do Portal dos Cerrados.</p><blockquote>O objetivo é unir leitura confortável com uma experiência visual de streaming.</blockquote><p>Você poderá publicar o conteúdo completo pelo painel gerente.</p>',publishedAt:new Date().toISOString()},
@@ -73,7 +90,7 @@ function demoData(){
 async function restoreSession(){
   try{
     const r=await api('me'); state.user=r.user; state.followed=r.user.followed||[]; personalize(); renderAll(); updateAccount();
-  }catch{ localStorage.removeItem('pc_token'); toggle('preview',true); }
+  }catch{ localStorage.removeItem('pc_token'); state.user=null; toggle('preview',false); }
 }
 
 function fillCities(){
@@ -105,7 +122,7 @@ function personalize(){
   });
 }
 
-function renderAll(){ personalize(); renderHero(); renderHome(); renderChannels(); renderFeed(); }
+function renderAll(){ personalize(); renderHero(); renderHome(); renderChannels(); renderFeed(); renderSearchSuggestions(); }
 
 function renderHero(){
   const city=$('#cityFilter')?.value || localStorage.getItem('pc_city') || state.user?.city || 'sua região';
@@ -147,8 +164,15 @@ function renderChannels(){
   $('#channels').innerHTML=cards; $('#channelsGrid').innerHTML=cards;
 }
 
+
+function requireAccount(reason='interagir com o Portal'){
+  if(state.user || API_URL.includes('COLE_AQUI')) return false;
+  openAuth('signup',`Crie sua conta grátis para ${reason}. Você continua podendo ler e assistir às pautas sem cadastro.`);
+  return true;
+}
+
 async function toggleFollow(cat){
-  if(!state.user && !API_URL.includes('COLE_AQUI')) return openAuth('login');
+  if(requireAccount('seguir canais e personalizar seu feed')) return;
   const has=state.followed.includes(cat); state.followed=has?state.followed.filter(x=>x!==cat):[...state.followed,cat];
   if(state.user) state.user.followed=state.followed; localStorage.setItem('pc_followed',JSON.stringify(state.followed));
   renderAll(); toast(has?'Canal removido dos favoritos':'Você está seguindo este canal');
@@ -272,7 +296,7 @@ async function refreshFeed(){
   try{
     if(!API_URL.includes('COLE_AQUI')){
       const r=await api('bootstrap',{city:$('#cityFilter').value||localStorage.getItem('pc_city')||''});
-      state.news=r.news||state.news; state.ads=r.ads||state.ads; state.online=r.online||state.online;
+      state.news=r.news||state.news; state.ads=r.ads||state.ads; setOnlineFromReal(r.online,true);
       localStorage.setItem('pc_boot',JSON.stringify({ts:Date.now(),cities:state.cities,news:state.news,ads:state.ads}));
     }
     state.feedNonce=Date.now()+Math.random();
@@ -567,12 +591,12 @@ async function openComments(id){
     $('#commentsList').innerHTML=all.filter(c=>!c.parentId).map(c=>commentHtml(c,all)).join('')||'<div class="muted">Seja o primeiro a comentar.</div>';
   }catch(e){$('#commentsList').innerHTML=`<div class="muted">${safe(e.message)}</div>`}
 }
-function beginReply(id,name){ state.replyTo=id; $('#replyLabel').textContent='Respondendo a @'+name; $('#replyBar').classList.remove('hide'); $('#commentText').focus(); }
+function beginReply(id,name){ if(requireAccount('responder comentários')) return; state.replyTo=id; $('#replyLabel').textContent='Respondendo a @'+name; $('#replyBar').classList.remove('hide'); $('#commentText').focus(); }
 function cancelReply(){ state.replyTo=null; $('#replyBar').classList.add('hide'); }
 function closeComments(){ cancelReply(); toggle('commentsModal',false); }
 async function sendComment(){
   const text=$('#commentText').value.trim(); if(!text)return;
-  if(!state.user && !API_URL.includes('COLE_AQUI')) return openAuth('login');
+  if(requireAccount('comentar e participar das conversas')) return;
   loading(true,state.replyTo?'Publicando resposta...':'Publicando comentário...');
   try{
     if(!API_URL.includes('COLE_AQUI')) await api('addComment',{newsId:state.currentCommentNewsId,text,parentId:state.replyTo||''});
@@ -580,8 +604,33 @@ async function sendComment(){
   }catch(e){toast(e.message)} finally{loading(false)}
 }
 
-function openAuth(mode){ state.authMode=mode; toggle('preview',false); toggle('authModal',true); $('#signupFields').classList.toggle('hide',mode!=='signup'); $('#authTitle').textContent=mode==='signup'?'Criar conta grátis':'Entrar'; $('#authSubmit').textContent=mode==='signup'?'Criar conta':'Entrar'; }
-function closeAuth(){toggle('authModal',false); if(!localStorage.getItem('pc_token'))toggle('preview',true)}
+function openAuth(mode='signup',context=''){
+  state.authMode=mode;
+  toggle('preview',false);
+  toggle('authModal',true);
+
+  const signup=mode==='signup';
+  $('#signupFields').classList.toggle('hide',!signup);
+  $('#authTitle').textContent=signup?'Criar conta grátis':'Entrar na sua conta';
+  $('#authSubmit').textContent=signup?'Criar conta grátis':'Entrar';
+  $('#forgotBtn')?.classList.toggle('hide',signup);
+  $('#authTabSignup')?.classList.toggle('active',signup);
+  $('#authTabLogin')?.classList.toggle('active',!signup);
+
+  const icon=$('.authIcon i');
+  if(icon) icon.className=signup?'fa-solid fa-user-plus':'fa-solid fa-right-to-bracket';
+
+  const contextEl=$('#authContext');
+  if(contextEl){
+    contextEl.textContent=context || (signup
+      ? 'Crie sua conta gratuitamente para comentar, seguir canais e personalizar sua experiência.'
+      : 'Entre para continuar usando suas interações e preferências salvas.');
+  }
+}
+function closeAuth(){
+  toggle('authModal',false);
+  toggle('preview',false);
+}
 async function submitAuth(){
   const email=$('#authEmail').value.trim(), password=$('#authPassword').value, city=$('#signupCity').value;
   if(!email||!password)return toast('Preencha e-mail e senha.');
@@ -690,6 +739,8 @@ function goPage(name,btn){
   $$('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
   if(btn) btn.classList.add('active');
 
+  if(name==='search') renderSearchSuggestions();
+
   if(name==='feed'){
     // O clique em Feed é o único momento em que o player do Feed é ativado.
     requestAnimationFrame(()=>{
@@ -700,17 +751,50 @@ function goPage(name,btn){
   }
 }
 function openMenu(show=true){ $('#menuPanel').classList.toggle('open',show); updateAccount(); }
-function updateAccount(){ $('#accountSummary').innerHTML=state.user?`<b>${safe(state.user.email)}</b><div class="muted">${safe(state.user.city||'Sem cidade')}</div><small class="muted">${state.followed.length} canal(is) seguido(s)</small>`:'<b>Visitante</b><div class="muted">Entre para personalizar sua experiência.</div>'; }
-function openAccount(){ openMenu(false); toast('Sua cidade e canais favoritos ficam vinculados à sua conta.'); }
-function logout(){ localStorage.removeItem('pc_token'); state.user=null;state.followed=[];openMenu(false);toggle('preview',true);renderAll();toast('Você saiu da conta.'); }
+function updateAccount(){
+  $('#accountSummary').innerHTML=state.user
+    ? `<b>${safe(state.user.email)}</b><div class="muted">${safe(state.user.city||'Sem cidade')}</div><small class="muted">${state.followed.length} canal(is) seguido(s)</small>`
+    : `<b>Você está navegando como visitante</b><div class="muted" style="margin:5px 0 10px">Leia e assista gratuitamente. Crie uma conta apenas se quiser interagir.</div><button class="btn primary" style="width:100%" onclick="openMenu(false);openAuth('signup','Crie sua conta grátis para comentar, seguir canais e salvar suas preferências.')"><i class="fa-solid fa-user-plus"></i> Criar conta grátis</button><button class="btn ghost" style="width:100%;margin-top:7px" onclick="openMenu(false);openAuth('login')">Já tenho conta</button>`;
+}
+function openAccount(){
+  openMenu(false);
+  if(!state.user) return openAuth('signup','Crie sua conta grátis para salvar sua cidade, seguir canais e participar das interações.');
+  toast('Sua cidade e canais favoritos ficam vinculados à sua conta.');
+}
+function logout(){
+  if(!state.user){ openMenu(false); return openAuth('login'); }
+  localStorage.removeItem('pc_token'); state.user=null;state.followed=[];openMenu(false);toggle('preview',false);renderAll();updateAccount();toast('Você saiu da conta. Continue navegando como visitante.');
+}
 async function deleteAccount(){
+  if(!state.user){ openMenu(false); return openAuth('signup','Você ainda não possui uma conta. Crie uma gratuitamente se quiser usar recursos personalizados.'); }
   if(!confirm('Excluir sua conta permanentemente?'))return;
   loading(true,'Excluindo sua conta...');
   try{ if(!API_URL.includes('COLE_AQUI')) await api('deleteAccount'); localStorage.clear(); location.reload(); }catch(e){toast(e.message)}finally{loading(false)}
 }
+
+function renderSearchSuggestions(){
+  const el=$('#searchSuggestions');
+  const wrap=$('#searchSuggestionsWrap');
+  if(!el || !wrap) return;
+
+  const source=(state.feed&&state.feed.length?state.feed:state.news||[]);
+  const suggestions=[...source]
+    .sort((a,b)=>new Date(b.publishedAt||b.createdAt||0)-new Date(a.publishedAt||a.createdAt||0))
+    .slice(0,6);
+
+  el.innerHTML=suggestions.map(newsCard).join('')||'<div class="empty">As sugestões aparecerão aqui quando houver pautas publicadas.</div>';
+}
+
 function doSearch(){
-  const q=$('#searchInput').value.trim().toLowerCase(); const list=state.news.filter(n=>(n.title+' '+n.city+' '+n.category+' '+(n.summary||'')).toLowerCase().includes(q));
-  $('#searchResults').innerHTML=list.map(n=>`<div style="margin-bottom:10px">${newsCard(n)}</div>`).join('')||'<div class="empty">Nenhum resultado.</div>';
+  const q=$('#searchInput').value.trim().toLowerCase();
+  if(!q){
+    $('#searchResults').innerHTML='';
+    renderSearchSuggestions();
+    return;
+  }
+  const list=state.news.filter(n=>(n.title+' '+n.city+' '+n.category+' '+(n.summary||'')).toLowerCase().includes(q));
+  $('#searchResults').innerHTML=list.map(n=>`<div>${newsCard(n)}</div>`).join('')||'<div class="empty">Nenhum resultado. Veja algumas sugestões abaixo.</div>';
+  renderSearchSuggestions();
 }
 function shareNews(id){
   const n=state.news.find(x=>x.id===id); if(!n)return;
@@ -719,15 +803,18 @@ function shareNews(id){
 }
 
 async function heartbeat(){
-  if(API_URL.includes('COLE_AQUI')){ state.online=1; updateOnline(); return; }
+  if(API_URL.includes('COLE_AQUI')){
+    setOnlineFromReal(0,false);
+    return;
+  }
   let clientId=localStorage.getItem('pc_client_id');
-  if(!clientId){ clientId='anon-'+crypto.randomUUID(); localStorage.setItem('pc_client_id',clientId); }
+  if(!clientId){
+    clientId='anon-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random());
+    localStorage.setItem('pc_client_id',clientId);
+  }
   try{
     const r=await api('heartbeat',{city:$('#cityFilter').value||state.user?.city||'Todas',clientId});
-    {
-      const realOnline = Number(r.online || 0);
-      state.online = realOnline >= 50 ? realOnline : (45 + Math.floor(Math.random() * 6));
-    } updateOnline();
+    setOnlineFromReal(r.online,false);
   }catch{}
 }
 function updateOnline(){ $$('.onlineCount').forEach(x=>x.textContent=state.online); const h=$('#heroOnline');if(h)h.textContent=state.online; }
