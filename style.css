@@ -225,3 +225,55 @@ img,video,iframe{max-width:100%}
 .sheet.readingMode .article .body{font-size:20px;line-height:1.95;max-width:700px;margin-inline:auto}
 .sheet.readingMode .articleFooterActions{margin-top:32px}
 @media(max-width:520px){#page-feed .feedMeta{left:14px;right:72px;bottom:100px;max-height:48%}#page-feed .feedActions{right:8px;bottom:102px}.feedActions button{width:44px;height:44px;min-height:44px}.articleToolbar{padding-top:4px}.articleToolBtn span{font-size:12px}}
+
+/* ===== V13: acesso livre + cadastro só para interações ===== */
+.authExperience{
+  width:min(480px,100%);
+  padding:22px;
+  background:
+    radial-gradient(circle at 82% 0%,rgba(29,217,108,.13),transparent 30%),
+    linear-gradient(180deg,#0A3036,#06272d);
+}
+.authBrand{position:relative;display:flex;align-items:center;min-height:48px;margin-bottom:8px}
+.authBrand img{width:min(220px,62%);height:auto;display:block}
+.authClose{position:absolute;right:0;top:0}
+.authIcon{
+  width:54px;height:54px;border-radius:18px;
+  display:grid;place-items:center;
+  background:rgba(29,217,108,.13);
+  border:1px solid rgba(29,217,108,.22);
+  color:var(--accent);font-size:22px;margin:8px 0 13px
+}
+.authExperience h2{font-size:clamp(25px,5vw,34px);line-height:1.05;margin:0 0 8px}
+.authContext{margin:0 0 16px;color:#c9d6d5;line-height:1.5}
+.authTabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;background:#001A21;border:1px solid var(--line);border-radius:14px;margin:0 0 14px}
+.authTabs button{border:0;background:transparent;color:var(--muted);border-radius:10px;padding:10px;font-weight:800}
+.authTabs button.active{background:var(--card2);color:#fff;box-shadow:0 5px 18px rgba(0,0,0,.18)}
+.authLegal{font-size:11px!important;line-height:1.45;margin-bottom:0;text-align:center}
+@media(max-width:520px){
+  .modal{padding:10px;align-items:end}
+  .authExperience{border-radius:24px 24px 16px 16px;padding:18px;max-height:92dvh}
+  .authBrand img{width:min(190px,58%)}
+}
+
+/* ===== V13: sugestões na busca ===== */
+.searchSuggestionsWrap{padding:4px 0 28px}
+.searchSuggestions{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+.searchSuggestions .card{height:100%;cursor:pointer}
+#searchResults:not(:empty){
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+@media(max-width:760px){
+  .searchSuggestions,#searchResults:not(:empty){grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:480px){
+  .searchSuggestions,#searchResults:not(:empty){grid-template-columns:1fr}
+  .searchBox{align-items:stretch}
+  .searchBox .btn{padding-inline:13px}
+}
